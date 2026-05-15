@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test The Sky Live API (CORS Fixed)</title>
+  <title>Test AstronomyAPI (Basic Auth)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -24,13 +24,12 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .error {
-      color: red;
-    }
+    .error { color: red; }
+    .success { color: green; }
   </style>
 </head>
 <body>
-  <h1>Test The Sky Live API (CORS Fixed)</h1>
+  <h1>Test AstronomyAPI (Basic Auth)</h1>
   <p>Click the button to fetch Mars' current position:</p>
   <button id="fetchBtn">Fetch Mars Position</button>
   <div id="result">Waiting for data...</div>
@@ -42,26 +41,36 @@
       resultDiv.className = "";
 
       try {
-        // Use allorigins.win as a CORS proxy
-        const proxyUrl = "https://allorigins.win/get?url=";
-        const apiUrl = "https://api.theskylive.com/planets/mars";
+        // Replace these with your actual credentials
+        const applicationId = "547c16ab-87e2-4d9b-b12d-50bc87090749";
+        const applicationSecret = "YOUR_APPLICATION_SECRET"; // Replace this!
 
-        const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
+        // Create the Basic Auth string
+        const authString = btoa(`${547c16ab-87e2-4d9b-b12d-50bc87090749}:${8350220157ef5d0e41a4d3a658558fa1bdea470f52c44822062dae1e0f225068b6baeb73b7a12848b1f21d0ef6798c53af94cca27136308868e5ca05507bff262ca485fd077296ab8ed2fe6fb85715f377cba29ab4b6d7b21727b91252ece5d6234dad273017671129dad9467fd37be1}`);
+
+        // API request with Basic Auth
+        const apiUrl = "https://api.astronomyapi.com/api/v2/body/position/Mars?from_date=2026-05-15&to_date=2026-05-15";
+
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Basic ${authString}`
+          }
+        });
+
         if (!response.ok) {
-          throw new Error(`Proxy request failed: ${response.status}`);
+          throw new Error(`API request failed: ${response.status} ${response.statusText}`);
         }
-        const proxyData = await response.json();
 
-        // The actual API data is nested in proxyData.contents
-        const planetData = JSON.parse(proxyData.contents);
+        const data = await response.json();
+        const marsData = data.data[0]; // First entry in the array
 
-        // Display the data
         resultDiv.innerHTML = `
-          <p><strong>✅ Success! Mars Position Data:</strong></p>
-          <pre>${JSON.stringify(planetData, null, 2)}</pre>
-          <p><strong>Right Ascension (RA):</strong> ${planetData.ra}°</p>
-          <p><strong>Declination (Dec):</strong> ${planetData.dec}°</p>
-          <p><strong>Distance from Earth:</strong> ${planetData.distance} AU</p>
+          <p class="success"><strong>✅ Success! Mars Position (Heliocentric):</strong></p>
+          <pre>${JSON.stringify(marsData, null, 2)}</pre>
+          <p><strong>X:</strong> ${marsData.heliocentric.x} AU</p>
+          <p><strong>Y:</strong> ${marsData.heliocentric.y} AU</p>
+          <p><strong>Z:</strong> ${marsData.heliocentric.z} AU</p>
         `;
       } catch (error) {
         resultDiv.textContent = `❌ Error: ${error.message}`;
