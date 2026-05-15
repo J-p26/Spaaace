@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test AstronomyAPI (Basic Auth)</title>
+  <title>Test AstronomyAPI (Fixed Endpoint)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -29,7 +29,7 @@
   </style>
 </head>
 <body>
-  <h1>Test AstronomyAPI (Basic Auth)</h1>
+  <h1>Test AstronomyAPI (Fixed Endpoint)</h1>
   <p>Click the button to fetch Mars' current position:</p>
   <button id="fetchBtn">Fetch Mars Position</button>
   <div id="result">Waiting for data...</div>
@@ -41,21 +41,29 @@
       resultDiv.className = "";
 
       try {
-        // Replace these with your actual credentials (as strings)
+        // Replace these with your actual credentials
         const applicationId = "547c16ab-87e2-4d9b-b12d-50bc87090749";
         const applicationSecret = "8350220157ef5d0e41a4d3a658558fa1bdea470f52c44822062dae1e0f225068b6baeb73b7a12848b1f21d0ef6798c53af94cca27136308868e5ca05507bff262ca485fd077296ab8ed2fe6fb85715f377cba29ab4b6d7b21727b91252ece5d6234dad273017671129dad9467fd37be1";
 
-        // Create the Basic Auth string (FIXED)
+        // Create the Basic Auth string
         const authString = btoa(`${applicationId}:${applicationSecret}`);
 
-        // API request with Basic Auth
-        const apiUrl = "https://api.astronomyapi.com/api/v2/body/position/Mars?from_date=2026-05-15&to_date=2026-05-15";
+        // Correct API endpoint for planetary positions
+        const apiUrl = "https://api.astronomyapi.com/api/v2/bodies/positions";
+
+        // Request body (specify Mars and date)
+        const requestBody = {
+          body: "Mars",
+          date: "2026-05-15"
+        };
 
         const response = await fetch(apiUrl, {
-          method: 'GET',
+          method: 'POST', // AstronomyAPI requires POST for this endpoint
           headers: {
-            'Authorization': `Basic ${authString}`
-          }
+            'Authorization': `Basic ${authString}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestBody)
         });
 
         if (!response.ok) {
@@ -63,14 +71,13 @@
         }
 
         const data = await response.json();
-        const marsData = data.data[0]; // First entry in the array
+        console.log("API Response:", data); // Log the full response for debugging
 
+        // Extract Mars' heliocentric coordinates
+        const marsData = data.data; // Check the structure of the response
         resultDiv.innerHTML = `
-          <p class="success"><strong>✅ Success! Mars Position (Heliocentric):</strong></p>
+          <p class="success"><strong>✅ Success! Mars Position:</strong></p>
           <pre>${JSON.stringify(marsData, null, 2)}</pre>
-          <p><strong>X:</strong> ${marsData.heliocentric.x} AU</p>
-          <p><strong>Y:</strong> ${marsData.heliocentric.y} AU</p>
-          <p><strong>Z:</strong> ${marsData.heliocentric.z} AU</p>
         `;
       } catch (error) {
         resultDiv.textContent = `❌ Error: ${error.message}`;
