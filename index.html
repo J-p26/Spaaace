@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test AstronomyAPI (Fixed CORS Proxy)</title>
+  <title>Test The Sky Live API (Working)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -29,7 +29,7 @@
   </style>
 </head>
 <body>
-  <h1>Test AstronomyAPI (Fixed CORS Proxy)</h1>
+  <h1>Test The Sky Live API</h1>
   <p>Click the button to fetch Mars' current position:</p>
   <button id="fetchBtn">Fetch Mars Position</button>
   <div id="result">Waiting for data...</div>
@@ -41,44 +41,22 @@
       resultDiv.className = "";
 
       try {
-        // Replace these with your actual credentials
-        const applicationId = "547c16ab-87e2-4d9b-b12d-50bc87090749";
-        const applicationSecret = "8350220157ef5d0e41a4d3a658558fa1bdea470f52c44822062dae1e0f225068b6baeb73b7a12848b1f21d0ef6798c53af94cca27136308868e5ca05507bff262ca485fd077296ab8ed2fe6fb85715f377cba29ab4b6d7b21727b91252ece5d6234dad273017671129dad9467fd37be1";
+        // The Sky Live API (no auth, CORS-friendly)
+        const apiUrl = "https://api.theskylive.com/planets/mars";
 
-        // Create the Basic Auth string
-        const authString = btoa(`${applicationId}:${applicationSecret}`);
-
-        // Use a CORS proxy (allorigins.win)
-        const proxyUrl = "https://allorigins.win/get?url=";
-        const apiUrl = "https://api.astronomyapi.com/api/v2/bodies/positions";
-
-        // Encode the full API URL (including query parameters)
-        const encodedUrl = encodeURIComponent(apiUrl);
-
-        // Fetch via proxy (GET request)
-        const response = await fetch(`${proxyUrl}${encodedUrl}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Basic ${authString}`
-          }
-        });
-
+        const response = await fetch(apiUrl);
         if (!response.ok) {
-          throw new Error(`Proxy request failed: ${response.status} ${response.statusText}`);
+          throw new Error(`API request failed: ${response.status} ${response.statusText}`);
         }
 
-        const proxyData = await response.json();
-        console.log("Proxy Response:", proxyData); // Debugging
-
-        // The actual API data is nested in proxyData.contents
-        const data = JSON.parse(proxyData.contents);
-        console.log("API Data:", data); // Debugging
-
-        // Extract Mars' heliocentric coordinates
-        const marsData = data.data;
+        const marsData = await response.json();
         resultDiv.innerHTML = `
           <p class="success"><strong>✅ Success! Mars Position:</strong></p>
           <pre>${JSON.stringify(marsData, null, 2)}</pre>
+          <p><strong>Right Ascension (RA):</strong> ${marsData.ra}°</p>
+          <p><strong>Declination (Dec):</strong> ${marsData.dec}°</p>
+          <p><strong>Distance from Earth:</strong> ${marsData.distance} AU</p>
+          <p><strong>Constellation:</strong> ${marsData.constellation}</p>
         `;
       } catch (error) {
         resultDiv.textContent = `❌ Error: ${error.message}`;
