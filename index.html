@@ -42,14 +42,18 @@
 
       try {
         // The Sky Live API (no auth, CORS-friendly)
+        // THIS IS THE CORRECT URL - NO PROXY, NO ASTRONOMYAPI
         const apiUrl = "https://api.theskylive.com/planets/mars";
 
         const response = await fetch(apiUrl);
+
         if (!response.ok) {
           throw new Error(`API request failed: ${response.status} ${response.statusText}`);
         }
 
         const marsData = await response.json();
+
+        // Display the data
         resultDiv.innerHTML = `
           <p class="success"><strong>✅ Success! Mars Position:</strong></p>
           <pre>${JSON.stringify(marsData, null, 2)}</pre>
