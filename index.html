@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test AstronomyAPI (CORS Proxy)</title>
+  <title>Test AstronomyAPI (Fixed CORS Proxy)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -29,7 +29,7 @@
   </style>
 </head>
 <body>
-  <h1>Test AstronomyAPI (CORS Proxy)</h1>
+  <h1>Test AstronomyAPI (Fixed CORS Proxy)</h1>
   <p>Click the button to fetch Mars' current position:</p>
   <button id="fetchBtn">Fetch Mars Position</button>
   <div id="result">Waiting for data...</div>
@@ -52,22 +52,15 @@
         const proxyUrl = "https://allorigins.win/get?url=";
         const apiUrl = "https://api.astronomyapi.com/api/v2/bodies/positions";
 
-        // Encode the API URL and request body for the proxy
-        const requestBody = {
-          body: "Mars",
-          date: "2026-05-15"
-        };
+        // Encode the full API URL (including query parameters)
         const encodedUrl = encodeURIComponent(apiUrl);
-        const encodedBody = encodeURIComponent(JSON.stringify(requestBody));
 
-        // Fetch via proxy
+        // Fetch via proxy (GET request)
         const response = await fetch(`${proxyUrl}${encodedUrl}`, {
-          method: 'POST',
+          method: 'GET',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Basic ${authString}`
-          },
-          body: JSON.stringify(requestBody)
+          }
         });
 
         if (!response.ok) {
@@ -75,7 +68,11 @@
         }
 
         const proxyData = await response.json();
-        const data = JSON.parse(proxyData.contents); // Parse the nested JSON
+        console.log("Proxy Response:", proxyData); // Debugging
+
+        // The actual API data is nested in proxyData.contents
+        const data = JSON.parse(proxyData.contents);
+        console.log("API Data:", data); // Debugging
 
         // Extract Mars' heliocentric coordinates
         const marsData = data.data;
