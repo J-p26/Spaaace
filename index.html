@@ -41,12 +41,12 @@
       resultDiv.className = "";
 
       try {
-        // Replace these with your actual credentials
+        // Replace these with your actual credentials (as strings)
         const applicationId = "547c16ab-87e2-4d9b-b12d-50bc87090749";
-        const applicationSecret = "YOUR_APPLICATION_SECRET"; // Replace this!
+        const applicationSecret = "8350220157ef5d0e41a4d3a658558fa1bdea470f52c44822062dae1e0f225068b6baeb73b7a12848b1f21d0ef6798c53af94cca27136308868e5ca05507bff262ca485fd077296ab8ed2fe6fb85715f377cba29ab4b6d7b21727b91252ece5d6234dad273017671129dad9467fd37be1";
 
-        // Create the Basic Auth string
-        const authString = btoa(`${547c16ab-87e2-4d9b-b12d-50bc87090749}:${8350220157ef5d0e41a4d3a658558fa1bdea470f52c44822062dae1e0f225068b6baeb73b7a12848b1f21d0ef6798c53af94cca27136308868e5ca05507bff262ca485fd077296ab8ed2fe6fb85715f377cba29ab4b6d7b21727b91252ece5d6234dad273017671129dad9467fd37be1}`);
+        // Create the Basic Auth string (FIXED)
+        const authString = btoa(`${applicationId}:${applicationSecret}`);
 
         // API request with Basic Auth
         const apiUrl = "https://api.astronomyapi.com/api/v2/body/position/Mars?from_date=2026-05-15&to_date=2026-05-15";
